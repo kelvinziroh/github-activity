@@ -22,6 +22,10 @@ def main():
             print(
                 f"- [{format_date(event['created_at'])}]: Starred {event['repo']['name']}\n"
             )
+        elif event["type"] == "CreateEvent":
+            print(
+                f"- [{format_date(event['created_at'])}]: Created {event['repo']['name']}\n"
+            )
         else:
             print(f"event id: {event['id']}")
             print(f"event type: {event['type']}")
