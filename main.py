@@ -14,14 +14,19 @@ def main():
     event_data = json.loads(response)
     print(f"{username}'s activity:")
     for event in event_data:
-        print(f"event id: {event['id']}")
-        print(f"event type: {event['type']}")
-        print(f"repo: {event['repo']['name']}")
-        print(f"public: {event['public']}")
-        print(f"created_at: {format_date(event['created_at'])}\n")
+        if event["type"] == "PushEvent":
+            print(
+                f"- [{format_date(event['created_at'])}]: Pushed commit(s) to {event['repo']['name']}\n"
+            )
+        else:
+            print(f"event id: {event['id']}")
+            print(f"event type: {event['type']}")
+            print(f"repo: {event['repo']['name']}")
+            print(f"public: {event['public']}")
+            print(f"created_at: {format_date(event['created_at'])}\n")
 
 
-def format_date(date_str: str):
+def format_date(date_str: str) -> str:
     iso_str = date_str.replace("Z", "+00:00")
     dt_utc = datetime.fromisoformat(iso_str)
     dt_local = dt_utc.astimezone()
