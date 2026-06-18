@@ -18,6 +18,10 @@ def main():
             print(
                 f"- [{format_date(event['created_at'])}]: Pushed commit(s) to {event['repo']['name']}\n"
             )
+        elif event["type"] == "WatchEvent":
+            print(
+                f"- [{format_date(event['created_at'])}]: Starred {event['repo']['name']}\n"
+            )
         else:
             print(f"event id: {event['id']}")
             print(f"event type: {event['type']}")
