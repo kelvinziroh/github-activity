@@ -4,11 +4,8 @@ import requests
 
 
 def main():
-    username = input("Enter username: ")
-    event_data = requests.get(
-        f"https://api.github.com/users/{username}/events",
-        headers={"accept": "application/vnd.github+json"},
-    ).json()
+    username = get_username()
+    event_data = get_data(username)
     print(f"{username}'s activity:\n")
     if len(event_data) == 0:
         print(f"{username} has no recent activity in the last 90 days")
@@ -57,6 +54,19 @@ def main():
                 print(f"repo: {event['repo']['name']}")
                 print(f"public: {event['public']}")
                 print(f"created_at: {format_date(event['created_at'])}\n")
+
+
+def get_username() -> str:
+    username = input("Enter username: ")
+    return username
+
+
+def get_data(username) -> list[dict]:
+    data = requests.get(
+        f"https://api.github.com/users/{username}/events",
+        headers={"accept": "application/vnd.github+json"},
+    ).json()
+    return data
 
 
 def format_date(date_str: str) -> str:
