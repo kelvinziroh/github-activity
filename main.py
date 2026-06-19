@@ -59,7 +59,7 @@ def main():
 
 def get_username() -> str:
     parser = argparse.ArgumentParser()
-    parser.add_argument("username")
+    parser.add_argument("username", help="The handle for the GitHub user account")
     args = parser.parse_args()
     return args.username
 
