@@ -1,5 +1,3 @@
-import json
-import pprint
 from datetime import datetime
 
 import requests
@@ -7,31 +5,50 @@ import requests
 
 def main():
     username = input("Enter username: ")
-    response = requests.get(
+    event_data = requests.get(
         f"https://api.github.com/users/{username}/events",
         headers={"accept": "application/vnd.github+json"},
-    ).text
-    event_data = json.loads(response)
-    print(f"{username}'s activity:")
-    for event in event_data:
-        if event["type"] == "PushEvent":
-            print(
-                f"- [{format_date(event['created_at'])}]: Pushed commit(s) to {event['repo']['name']}\n"
-            )
-        elif event["type"] == "WatchEvent":
-            print(
-                f"- [{format_date(event['created_at'])}]: Starred {event['repo']['name']}\n"
-            )
-        elif event["type"] == "CreateEvent":
-            print(
-                f"- [{format_date(event['created_at'])}]: Created {event['repo']['name']}\n"
-            )
-        else:
-            print(f"event id: {event['id']}")
-            print(f"event type: {event['type']}")
-            print(f"repo: {event['repo']['name']}")
-            print(f"public: {event['public']}")
-            print(f"created_at: {format_date(event['created_at'])}\n")
+    ).json()
+    print(f"{username}'s activity:\n")
+    if len(event_data) == 0:
+        print(f"{username} has no recent activity in the last 90 days")
+    else:
+        for event in event_data:
+            repo = event["repo"]
+            payload = event["payload"]
+            if event["type"] == "PushEvent":
+                print(
+                    f"- [{format_date(event['created_at'])}]: Pushed commit(s) to {repo['name']}"
+                )
+            elif event["type"] == "WatchEvent":
+                print(f"- [{format_date(event['created_at'])}]: Starred {repo['name']}")
+            elif event["type"] == "CreateEvent":
+                print(f"- [{format_date(event['created_at'])}]: Created {repo['name']}")
+            elif event["type"] == "PullRequestEvent":
+                if payload["action"] in ["assigned", "unassigned"]:
+                    print(
+                        f"- [{format_date(event['created_at'])}]: {payload['action'].capitalize()} PR #{payload['number']} to {payload['assignee']} in {repo['name']}"
+                    )
+                else:
+                    print(
+                        f"- [{format_date(event['created_at'])}]: {payload['action'].capitalize()} PR #{payload['number']} in {repo['name']}"
+                    )
+            elif event["type"] == "PullRequestReviewEvent":
+                pr_number = payload["pull_request"]["number"]
+                print(
+                    f"- [{format_date(event['created_at'])}]: {payload['action'].capitalize()} review on PR #{pr_number} in {repo['name']}"
+                )
+            elif event["type"] == "PullRequestReviewCommentEvent":
+                pr_number = payload["pull_request"]["number"]
+                print(
+                    f"- [{format_date(event['created_at'])}]: Commented on PR #{pr_number} review in {repo['name']}"
+                )
+            else:
+                print(f"event id: {event['id']}")
+                print(f"event type: {event['type']}")
+                print(f"repo: {event['repo']['name']}")
+                print(f"public: {event['public']}")
+                print(f"created_at: {format_date(event['created_at'])}\n")
 
 
 def format_date(date_str: str) -> str:
