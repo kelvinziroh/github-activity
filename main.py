@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime
 
 import requests
@@ -57,8 +58,10 @@ def main():
 
 
 def get_username() -> str:
-    username = input("Enter username: ")
-    return username
+    parser = argparse.ArgumentParser()
+    parser.add_argument("username")
+    args = parser.parse_args()
+    return args.username
 
 
 def get_data(username) -> list[dict]:
