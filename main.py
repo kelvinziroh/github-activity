@@ -7,54 +7,53 @@ import requests
 def main():
     username = get_username()
     event_data = get_data(username)
+    render_activity(username, event_data)
+
+
+def render_activity(username: str, event_data: list):
     print(f"{username}'s activity:\n")
     if len(event_data) == 0:
         print(f"{username} has no recent activity in the last 90 days")
     else:
         for event in event_data:
+            type = event["type"]
             repo = event["repo"]
             payload = event["payload"]
-            if event["type"] == "PushEvent":
+            formatted_date = format_date(event["created_at"])
+            pr_number = (
+                payload["pull_request"]["number"] if "pull_request" in payload else None
+            )
+
+            if type == "PushEvent":
+                print(f"- [{formatted_date}]: Pushed commit(s) to {repo['name']}")
+            elif type == "WatchEvent":
+                print(f"- [{formatted_date}]: Starred {repo['name']}")
+            elif type == "CreateEvent":
+                print(f"- [{formatted_date}]: Created {repo['name']}")
+            elif type == "PullRequestEvent":
                 print(
-                    f"- [{format_date(event['created_at'])}]: Pushed commit(s) to {repo['name']}"
+                    f"- [{formatted_date}]: {payload['action'].capitalize()} PR #{payload['number']} in {repo['name']}"
                 )
-            elif event["type"] == "WatchEvent":
-                print(f"- [{format_date(event['created_at'])}]: Starred {repo['name']}")
-            elif event["type"] == "CreateEvent":
-                print(f"- [{format_date(event['created_at'])}]: Created {repo['name']}")
-            elif event["type"] == "PullRequestEvent":
-                if payload["action"] in ["assigned", "unassigned"]:
-                    print(
-                        f"- [{format_date(event['created_at'])}]: {payload['action'].capitalize()} PR #{payload['number']} to {payload['assignee']} in {repo['name']}"
-                    )
-                else:
-                    print(
-                        f"- [{format_date(event['created_at'])}]: {payload['action'].capitalize()} PR #{payload['number']} in {repo['name']}"
-                    )
-            elif event["type"] == "PullRequestReviewEvent":
-                pr_number = payload["pull_request"]["number"]
+            elif type == "PullRequestReviewEvent":
                 print(
-                    f"- [{format_date(event['created_at'])}]: {payload['action'].capitalize()} review on PR #{pr_number} in {repo['name']}"
+                    f"- [{formatted_date}]: {payload['action'].capitalize()} review on PR #{pr_number} in {repo['name']}"
                 )
-            elif event["type"] == "PullRequestReviewCommentEvent":
-                pr_number = payload["pull_request"]["number"]
+            elif type == "PullRequestReviewCommentEvent":
                 print(
-                    f"- [{format_date(event['created_at'])}]: Commented on PR #{pr_number} review in {repo['name']}"
+                    f"- [{formatted_date}]: Commented on PR #{pr_number} review in {repo['name']}"
                 )
-            elif event["type"] == "IssueEvent":
+            elif type == "IssuesEvent":
                 print(
-                    f"- [{format_date(event['created_at'])}]: {payload['action'].captialize()} an issue in {repo['name']}"
+                    f"- [{formatted_date}]: {payload['action'].capitalize()} an issue in {repo['name']}"
                 )
-            elif event["type"] == "IssueCommentEvent":
-                print(
-                    f"- [{format_date(event['created_at'])}]: Commented on an issue in {repo['name']}"
-                )
+            elif type == "IssueCommentEvent":
+                print(f"- [{formatted_date}]: Commented on an issue in {repo['name']}")
             else:
                 print(f"event id: {event['id']}")
-                print(f"event type: {event['type']}")
-                print(f"repo: {event['repo']['name']}")
+                print(f"event type: {type}")
+                print(f"repo: {repo['name']}")
                 print(f"public: {event['public']}")
-                print(f"created_at: {format_date(event['created_at'])}\n")
+                print(f"created_at: {formatted_date}\n")
 
 
 def get_username() -> str:
