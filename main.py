@@ -43,6 +43,14 @@ def main():
                 print(
                     f"- [{format_date(event['created_at'])}]: Commented on PR #{pr_number} review in {repo['name']}"
                 )
+            elif event["type"] == "IssueEvent":
+                print(
+                    f"- [{format_date(event['created_at'])}]: {payload['action'].captialize()} an issue in {repo['name']}"
+                )
+            elif event["type"] == "IssueCommentEvent":
+                print(
+                    f"- [{format_date(event['created_at'])}]: Commented on an issue in {repo['name']}"
+                )
             else:
                 print(f"event id: {event['id']}")
                 print(f"event type: {event['type']}")
