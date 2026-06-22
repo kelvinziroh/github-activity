@@ -2,6 +2,8 @@ import pprint
 
 import requests
 
+from activity import format_date
+
 
 def render_info(username: str, info_data: dict):
     print(f"{username}'s profile:\n")
@@ -14,8 +16,8 @@ def get_info(data: dict) -> dict:
         "name": data["name"],
         "username": data["login"],
         "location": data["location"],
-        "created_at": data["created_at"],
-        "updated_at": data["updated_at"],
+        "created_at": format_date(data["created_at"]),
+        "updated_at": format_date(data["updated_at"]),
         "public_repos": data["public_repos"],
         "followers": data["followers"],
         "following": data["following"],
