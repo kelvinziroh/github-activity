@@ -9,30 +9,21 @@ from info import get_info, render_info
 
 
 def main():
-    # username = get_username()
     args = get_args()
     username = args.username
-    activity_log, activity_stats, filtered_info = [], {}, {}
-
-    activity_data = get_data(f"https://api.github.com/users/{username}/events")
-    info_data = get_data(f"https://api.github.com/users/{username}")
-
-    if activity_data is None or info_data is None:
-        sys.exit()
-    activity_log, activity_stats = get_activity(activity_data)
-    filtered_info = get_info(info_data)
 
     if args.profile:
+        info_data = get_data(f"https://api.github.com/users/{username}")
+        if info_data is None:
+            sys.exit()
+        filtered_info = get_info(info_data)
         render_info(username, filtered_info)
     else:
+        activity_data = get_data(f"https://api.github.com/users/{username}/events")
+        if activity_data is None:
+            sys.exit()
+        activity_log, activity_stats = get_activity(activity_data)
         render_activity(username, activity_log, activity_stats)
-
-
-# def get_username():
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("username", help="The handle for the GitHub user account")
-#     args = parser.parse_args()
-#     return args.username
 
 
 def get_args():
