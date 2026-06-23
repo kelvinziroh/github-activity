@@ -9,27 +9,43 @@ from info import get_info, render_info
 
 
 def main():
-    username = get_username()
+    # username = get_username()
+    args = get_args()
+    username = args.username
     activity_log, activity_stats, filtered_info = [], {}, {}
 
-    info_data = get_data(f"https://api.github.com/users/{username}")
     activity_data = get_data(f"https://api.github.com/users/{username}/events")
+    info_data = get_data(f"https://api.github.com/users/{username}")
 
-    if info_data is None or activity_data is None:
+    if activity_data is None or info_data is None:
         sys.exit()
+    activity_log, activity_stats = get_activity(activity_data)
+    filtered_info = get_info(info_data)
+
+    if args.profile:
+        render_info(username, filtered_info)
     else:
-        filtered_info = get_info(info_data)
-        activity_log, activity_stats = get_activity(activity_data)
-
-    render_info(username, filtered_info)
-    render_activity(username, activity_log, activity_stats)
+        render_activity(username, activity_log, activity_stats)
 
 
-def get_username() -> str:
+# def get_username():
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("username", help="The handle for the GitHub user account")
+#     args = parser.parse_args()
+#     return args.username
+
+
+def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("username", help="The handle for the GitHub user account")
+    parser.add_argument(
+        "--profile",
+        help="Display profile for the GitHub user account",
+        action="store_true",
+    )
+
     args = parser.parse_args()
-    return args.username
+    return args
 
 
 def get_data(endpoint: str):
