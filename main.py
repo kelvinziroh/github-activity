@@ -1,4 +1,5 @@
 import argparse
+import sys
 from datetime import datetime
 
 import requests
@@ -9,18 +10,15 @@ from info import get_info, render_info
 
 def main():
     username = get_username()
-    filtered_info = {}
-    activity_log = []
-    activity_stats = {}
-    info_endpoint = f"https://api.github.com/users/{username}"
-    events_endpoint = f"https://api.github.com/users/{username}/events"
+    activity_log, activity_stats, filtered_info = [], {}, {}
 
-    info_data = get_data(info_endpoint)
-    if info_data is not None:
+    info_data = get_data(f"https://api.github.com/users/{username}")
+    activity_data = get_data(f"https://api.github.com/users/{username}/events")
+
+    if info_data is None or activity_data is None:
+        sys.exit()
+    else:
         filtered_info = get_info(info_data)
-
-    activity_data = get_data(events_endpoint)
-    if activity_data is not None:
         activity_log, activity_stats = get_activity(activity_data)
 
     render_info(username, filtered_info)
