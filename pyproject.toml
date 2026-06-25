@@ -1,9 +1,12 @@
 [project]
 name = "github-activity"
 version = "0.1.0"
-description = "Add your description here"
+description = "Display GitHub user activity on the terminal"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "requests>=2.34.2",
 ]
+
+[project.scripts]
+github-activity = "github_activity.main:main"
