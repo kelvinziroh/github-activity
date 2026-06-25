@@ -40,7 +40,8 @@ def get_activity(event_data: list) -> tuple[list, dict[str, int]]:
             payload["pull_request"]["number"] if "pull_request" in payload else None
         )
 
-        activity_stats[type] += 1
+        if type in activity_stats:
+            activity_stats[type] += 1
 
         match type:
             case "PushEvent":
