@@ -2,7 +2,7 @@ import pprint
 
 import requests
 
-from activity import format_date
+from github_activity.activity import format_date
 
 
 def render_info(username: str, info_data: dict):

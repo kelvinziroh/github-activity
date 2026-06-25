@@ -4,8 +4,8 @@ from datetime import datetime
 
 import requests
 
-from activity import get_activity, render_activity
-from info import get_info, render_info
+from github_activity.activity import get_activity, render_activity
+from github_activity.info import get_info, render_info
 
 
 def main():
